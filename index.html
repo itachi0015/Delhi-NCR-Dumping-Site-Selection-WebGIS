@@ -1,118 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Optimal Dumping Site Locations - Delhi-NCR</title>
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
-  <script src="https://js.arcgis.com/4.25/"></script>
-  <style>
-    html, body, #viewDiv {
-      padding: 0;
-      margin: 0;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoServer Layers on Map</title>
+    <!-- Include Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* General page styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #eaf9e7; /* Light green background */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header styling */
+        header {
+            background-color: #28a745; /* Green header */
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        header p {
+            margin-top: 2px;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        /* Instruction Message */
+        .instruction-message {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #333;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #28a745; /* Green footer */
+            color: white;
+            text-align: center;
+            padding: 0.1px;
+            flex-shrink: 0;
+        }
+
+        /* Map container styling */
+        #map {
+            flex-grow: 1; /* Allow the map to take up remaining space */
+            height: 0; /* Ensures the map takes full available space */
+            margin: 0;
+            border: 2px solid #28a745; /* Green border around map */
+        }
+
+        /* Button for clean India theme */
+        .clean-india-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 0;
+            text-align: center;
+            display: block;
+        }
+
+        .clean-india-btn:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Clear buffer button */
+        .clear-buffer-btn {
+            background-color: #dc3545; /* Red background */
+            color: white;
+            padding: 5px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 0;
+            text-align: center;
+            display: block;
+        }
+
+        .clear-buffer-btn:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            #map {
+                height: 100%; /* Ensure map occupies full screen on small screens */
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div id="viewDiv"></div>
 
-  <script>
-    require([
-      "esri/Map",
-      "esri/views/MapView",
-      "esri/layers/FeatureLayer",
-      "esri/widgets/Legend",
-      "esri/widgets/Search"
-    ], function(Map, MapView, FeatureLayer, Legend, Search) {
-      
-      // Create the map with a base layer
-      const map = new Map({
-        basemap: "streets-navigation-vector"
-      });
+    <!-- Header Section -->
+    <header>
+        <h1>Optimal Dumping Site Locations - Delhi-NCR</h1>
+        <p>Interactive Map for Optimal Dumping Site Locations in Delhi-NCR</p>
+    </header>
 
-      // Create the view and set center over Delhi NCR
-      const view = new MapView({
-        container: "viewDiv",
-        map: map,
-        center: [77.2090, 28.6139], // Delhi coordinates
-        zoom: 10
-      });
+    <!-- Instruction Message -->
+    <div class="instruction-message">
+        Click on the map to create a buffer
+    </div>
 
-      // Define Suitable Layer (assuming you have this layer published on ArcGIS)
-      const suitableLayer = new FeatureLayer({
-        url: "https://<your_arcgis_server>/FeatureServer/0", // Replace with your service URL
-        title: "Suitable Areas",
-        opacity: 0.7,
-        renderer: {
-          type: "simple",
-          symbol: {
-            type: "simple-fill",
-            color: "green",
-            style: "solid",
-            outline: {
-              color: "black",
-              width: 0.5
-            }
-          }
-        }
-      });
+    <!-- Map container -->
+    <div id="map"></div>
 
-      // Define Not Suitable Layer
-      const notSuitableLayer = new FeatureLayer({
-        url: "https://<your_arcgis_server>/FeatureServer/1", // Replace with your service URL
-        title: "Not Suitable Areas",
-        opacity: 0.5,
-        renderer: {
-          type: "simple",
-          symbol: {
-            type: "simple-fill",
-            color: "red",
-            style: "solid",
-            outline: {
-              color: "black",
-              width: 0.5
-            }
-          }
-        }
-      });
+    <!-- Button to join Clean India Movement -->
+    <button class="clean-india-btn" onclick="alert('Let’s go green and clean India!')">
+        Join the Movement
+    </button>
 
-      // Add layers to the map
-      map.add(suitableLayer);
-      map.add(notSuitableLayer);
+    <!-- Button to clear buffer -->
+    <button class="clear-buffer-btn" onclick="clearBuffer()">
+        Clear Buffer
+    </button>
 
-      // Add Legend
-      const legend = new Legend({
-        view: view,
-        layerInfos: [
-          { layer: suitableLayer, title: "Suitable Areas" },
-          { layer: notSuitableLayer, title: "Not Suitable Areas" }
-        ]
-      });
-      view.ui.add(legend, "bottom-left");
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 GeoServer Integration. All rights reserved. | Clean and Green India Initiative</p>
+    </footer>
 
-      // Add Search widget to search for specific locations
-      const searchWidget = new Search({
-        view: view
-      });
-      view.ui.add(searchWidget, "top-right");
+    <!-- Include Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map and set view (center coordinates and zoom level)
+        const map = L.map('map').setView([28.6139, 77.2090], 10); // Coordinates for Delhi, modify as needed
 
-      // Display coordinates on map click
-      view.on("click", function(event) {
-        view.hitTest(event).then(function(response) {
-          if (response.results.length) {
-            const graphic = response.results[0].graphic;
-            view.popup.open({
-              title: "Site Information",
-              content: `Suitability: ${graphic.attributes.Suitability}`, // Example attribute
-              location: event.mapPoint
+        // Add OpenStreetMap as base layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add WMS layer for Suitable Areas (GeoServer Layer)
+        const suitableLayer = L.tileLayer.wms('http://localhost:8080/geoserver/Geo27/wms', {
+            layers: 'Geo27:point',  // Change this to your actual layer name
+            format: 'image/png',
+            transparent: true,
+            attribution: 'GeoServer'
+        }).addTo(map);
+
+        // Add Administrative Boundary Layer (GeoServer Layer)
+        const adminLayer = L.tileLayer.wms('http://localhost:8080/geoserver/Geo27/wms', {
+            layers: 'Geo27:ncr1',  // Replace with your administrative boundary layer name
+            format: 'image/png',
+            transparent: true,
+            attribution: 'Administrative Boundary Layer',
+            zIndex: 1 // Ensure this layer is on top
+        }).addTo(map);
+
+        // Add WMS layer for Road Layer (GeoServer Layer)
+        const roadLayer = L.tileLayer.wms('http://localhost:8080/geoserver/Geo27/wms', {
+            layers: 'Geo27:road',  // Change this to your actual road layer name
+            format: 'image/png',
+            transparent: true,
+            attribution: 'Road Layer'
+        }).addTo(map);
+
+        // Control to toggle layers on and off
+        const overlayMaps = {
+            "Not-Suitable Areas": suitableLayer,
+            "Administrative Boundary": adminLayer,
+            "Road Layer": roadLayer
+        };
+
+        L.control.layers(null, overlayMaps).addTo(map);
+
+        // Store buffer circles and labels separately
+        let bufferCircles = [];
+        let bufferLabels = [];
+
+        // Function to create buffer with distance label
+        function createBuffer(e) {
+            const point = e.latlng;
+            const radii = [500, 1000, 1500];  // Smaller buffer radii in meters
+            const colors = ['blue', 'green', 'orange'];  // Colors for each ring
+            radii.forEach((radius, index) => {
+                // Create the buffer circle with different colors
+                const buffer = L.circle(point, {
+                    radius: radius,
+                    color: colors[index],
+                    fillColor: colors[index],
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                // Add label with the distance
+                const label = L.marker(buffer.getBounds().getCenter(), {
+                    icon: L.divIcon({
+                        className: 'leaflet-label',
+                        html: `${radius}m`,
+                        iconSize: [40, 20],
+                        className: 'leaflet-label-text' // Make labels more visible
+                    })
+                }).addTo(map);
+
+                bufferCircles.push(buffer);  // Add buffer to circles array
+                bufferLabels.push(label);  // Add label to labels array
             });
-          }
-        });
-      });
-    });
-  </script>
+        }
+
+        // Function to clear all buffer layers
+        function clearBuffer() {
+            // Remove all buffer circles
+            bufferCircles.forEach(circle => {
+                map.removeLayer(circle);
+            });
+
+            // Remove all buffer labels
+            bufferLabels.forEach(label => {
+                map.removeLayer(label);
+            });
+
+            // Reset the arrays
+            bufferCircles = [];
+            bufferLabels = [];
+        }
+
+        // Event listener to create buffer on map click
+        map.on('click', createBuffer);
+    </script>
 </body>
 </html>
