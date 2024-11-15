@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Optimal Dumping Site Locations - Delhi-NCR</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.25/"></script>
+  <style>
+    html, body, #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Legend",
+      "esri/widgets/Search"
+    ], function(Map, MapView, FeatureLayer, Legend, Search) {
+      
+      // Create the map with a base layer
+      const map = new Map({
+        basemap: "streets-navigation-vector"
+      });
+
+      // Create the view and set center over Delhi NCR
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [77.2090, 28.6139], // Delhi coordinates
+        zoom: 10
+      });
+
+      // Define Suitable Layer (assuming you have this layer published on ArcGIS)
+      const suitableLayer = new FeatureLayer({
+        url: "https://<your_arcgis_server>/FeatureServer/0", // Replace with your service URL
+        title: "Suitable Areas",
+        opacity: 0.7,
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: "green",
+            style: "solid",
+            outline: {
+              color: "black",
+              width: 0.5
+            }
+          }
+        }
+      });
+
+      // Define Not Suitable Layer
+      const notSuitableLayer = new FeatureLayer({
+        url: "https://<your_arcgis_server>/FeatureServer/1", // Replace with your service URL
+        title: "Not Suitable Areas",
+        opacity: 0.5,
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: "red",
+            style: "solid",
+            outline: {
+              color: "black",
+              width: 0.5
+            }
+          }
+        }
+      });
+
+      // Add layers to the map
+      map.add(suitableLayer);
+      map.add(notSuitableLayer);
+
+      // Add Legend
+      const legend = new Legend({
+        view: view,
+        layerInfos: [
+          { layer: suitableLayer, title: "Suitable Areas" },
+          { layer: notSuitableLayer, title: "Not Suitable Areas" }
+        ]
+      });
+      view.ui.add(legend, "bottom-left");
+
+      // Add Search widget to search for specific locations
+      const searchWidget = new Search({
+        view: view
+      });
+      view.ui.add(searchWidget, "top-right");
+
+      // Display coordinates on map click
+      view.on("click", function(event) {
+        view.hitTest(event).then(function(response) {
+          if (response.results.length) {
+            const graphic = response.results[0].graphic;
+            view.popup.open({
+              title: "Site Information",
+              content: `Suitability: ${graphic.attributes.Suitability}`, // Example attribute
+              location: event.mapPoint
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
