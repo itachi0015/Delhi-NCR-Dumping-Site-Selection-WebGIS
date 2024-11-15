@@ -184,11 +184,20 @@
             attribution: 'Road Layer'
         }).addTo(map);
 
+        // Add Suitable Layer for dumping sites (GeoServer Layer)
+        const suitableAreaLayer = L.tileLayer.wms('http://localhost:8080/geoserver/Geo27/wms', {
+            layers: 'Geo27:Suitable2',  // Add the new Suitable layer
+            format: 'image/png',
+            transparent: true,
+            attribution: 'Suitable Area Layer'
+        }).addTo(map);
+
         // Control to toggle layers on and off
         const overlayMaps = {
             "Not-Suitable Areas": suitableLayer,
             "Administrative Boundary": adminLayer,
-            "Road Layer": roadLayer
+            "Road Layer": roadLayer,
+            "Suitable Areas": suitableAreaLayer  // Add Suitable layer to the control
         };
 
         L.control.layers(null, overlayMaps).addTo(map);
